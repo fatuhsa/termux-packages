@@ -92,7 +92,7 @@ if [ "$UNAME" = Darwin ]; then
 	SEC_OPT=""
 else
 	REPOROOT="$(dirname $(readlink -f $0))/../"
-	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
+	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --cap-add CAP_SYS_ADMIN --device /dev/fuse"
 fi
 
 if [ "${CI:-}" = "true" ]; then
@@ -146,7 +146,12 @@ load_apparmor_profile() {
 		if [ -n "$msg" ]; then
 			echo "$msg..."
 		fi
-		cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
+		if cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK; then
+			SEC_OPT="$SEC_OPT --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME"
+		else
+			echo "WARNING: failed to load AppArmor profile '$profile_path', continuing without it..."
+			APPARMOR_PARSER=""
+		fi
 	fi
 }
 

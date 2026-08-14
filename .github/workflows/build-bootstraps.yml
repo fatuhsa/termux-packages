@@ -61,8 +61,8 @@ jobs:
           readelf -l bin/bash | grep "Requesting program interpreter"
           echo "== SYMLINKS.txt (recreated by the app at install) =="
           ls -l SYMLINKS.txt && wc -l SYMLINKS.txt
-          echo "== NO com.termux references allowed (excluding github.com/termux URLs) =="
-          if grep -r "com.termux" . | grep -v "github.com/termux" ; then echo "FOUND com.termux references!"; exit 1; fi
+          echo "== NO com.termux references allowed (literal; URLs like github.com/termux have a slash, not a dot) =="
+          if grep -r "com\.termux" . ; then echo "FOUND com.termux references!"; exit 1; fi
           echo "OK: no com.termux references found"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

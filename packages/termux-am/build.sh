@@ -15,6 +15,7 @@ _GRADLE_VERSION=8.10.2
 termux_step_post_get_source() {
 	sed -i'' -E -e "s|\@TERMUX_PREFIX\@|${TERMUX_PREFIX}|g" "$TERMUX_PKG_SRCDIR/am-libexec-packaged"
 	sed -i'' -E -e "s|\@TERMUX_APP_PACKAGE\@|${TERMUX_APP_PACKAGE}|g" "$TERMUX_PKG_SRCDIR/app/src/main/java/com/termux/termuxam/FakeContext.java"
+	sed -i'' -E -e "s|com\.termux\.termuxam|${TERMUX_APP_PACKAGE}.termuxam|g" "$TERMUX_PKG_SRCDIR/am-libexec-packaged"
 }
 
 termux_step_make() {

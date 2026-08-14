@@ -691,7 +691,7 @@ main() {
 		local ROOTFS="$BOOTSTRAP_ROOTFS/${TERMUX_PREFIX}"
 		find "$ROOTFS" -type f -print0 | xargs -0 sed -i \
 			-e "s|/data/data/com\.termux|/data/data/${TERMUX_APP__PACKAGE_NAME}|g" \
-			-e "s|com\.termux\.app\.|${TERMUX_APP__NAMESPACE}.app.|g"
+			-e "s|com\.termux\.|${TERMUX_APP__NAMESPACE}.|g"
 
 		# Add termux bootstrap second stage files
 		add_termux_bootstrap_second_stage_files "$package_arch"

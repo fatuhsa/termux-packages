@@ -14,4 +14,5 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm755 "$TERMUX_PKG_BUILDER_DIR/sanix-hello" "$TERMUX_PREFIX/bin/sanix-hello"
+	cp "$TERMUX_PKG_BUILDER_DIR/LICENSE" "$TERMUX_PKG_SRCDIR/LICENSE"
 }

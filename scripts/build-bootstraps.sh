@@ -623,14 +623,14 @@ main() {
 
 		# Core utilities.
 		PACKAGES_LIST+=("bash") # Used by `termux-bootstrap-second-stage.sh`.
-		PACKAGES_LIST+=("bzip2")
+		PACKAGES_LIST+=("libbz2") # bzip2 merged into libbz2 as subpackage
 		if [[ "$BOOTSTRAP_ANDROID10_COMPATIBLE" == "false" ]]; then
 			PACKAGES_LIST+=("command-not-found")
 		else
 			PACKAGES_LIST+=("proot")
 		fi
 		PACKAGES_LIST+=("coreutils")
-		PACKAGES_LIST+=("curl")
+		PACKAGES_LIST+=("libcurl") # curl merged into libcurl as subpackage
 		PACKAGES_LIST+=("dash")
 		PACKAGES_LIST+=("diffutils")
 		PACKAGES_LIST+=("findutils")
@@ -647,7 +647,7 @@ main() {
 		PACKAGES_LIST+=("termux-keyring")
 		PACKAGES_LIST+=("termux-tools")
 		PACKAGES_LIST+=("util-linux")
-		PACKAGES_LIST+=("xz-utils")
+		PACKAGES_LIST+=("liblzma") # xz-utils merged into liblzma as subpackage
 
 		# Additional.
 		PACKAGES_LIST+=("ed")

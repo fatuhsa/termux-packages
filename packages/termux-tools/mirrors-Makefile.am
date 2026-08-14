@@ -1,0 +1,25 @@
+# Sanix (io.sanix) repository mirrors
+pkgdata_MIRRORS = default
+
+install-default: $(pkgdata_MIRRORS)
+	$(MKDIR_P) $(DESTDIR)$(sysconfdir)/termux/mirrors
+	for f in $(pkgdata_MIRRORS); do \
+		$(INSTALL) -m 644 $(srcdir)/$$f \
+		$(DESTDIR)$(sysconfdir)/termux/mirrors; \
+	done
+
+uninstall-default:
+	for f in $(pkgdata_MIRRORS); do \
+		rm -f $(DESTDIR)$(sysconfdir)/termux/mirrors/$$f; \
+	done
+	-rmdir $(DESTDIR)$(sysconfdir)/termux/mirrors
+
+create-deb-control-files:
+	rm -f ../conffiles; \
+	sh -c "cd $$(dirname $(DESTDIR)$(sysconfdir)); find $$(basename $(DESTDIR)$(sysconfdir))/termux/mirrors -type f" >> ../conffiles;
+
+install-data-local: install-default create-deb-control-files
+
+uninstall-local: uninstall-default
+
+EXTRA_DIST = $(pkgdata_MIRRORS)

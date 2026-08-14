@@ -1,0 +1,17 @@
+Origin: Sanix Termux fork (io.sanix)
+Label: Sanix
+Suite: stable
+Codename: stable
+Date: Fri, 14 Aug 2026 23:47:59 GMT
+Architectures: aarch64
+Components: main
+Description: Sanix (io.sanix) package repository
+MD5Sum:
+ d9d2f9e87fd96705dcf927d32853550c 110423 main/binary-aarch64/Packages
+ 171a4a93a14811628875df0b828fb931 35467 main/binary-aarch64/Packages.gz
+SHA1:
+ e1be72196c1a2f78d8fe2dde7b8449035c6aed6b 110423 main/binary-aarch64/Packages
+ 7bb669ac32edc46812090b153104f8038c26dadc 35467 main/binary-aarch64/Packages.gz
+SHA256:
+ 2934ae26ad8c340e3ff0c8f0fbc59d900449b2f41d1ecbd373ecadfe2c782817 110423 main/binary-aarch64/Packages
+ bbf98724efb6b6a94a8075f7ca1ced3f956c96b92752224e7b7e8df28706df33 35467 main/binary-aarch64/Packages.gz

@@ -55,7 +55,9 @@ echo "Docker trap killing DOCKER_PROCESS" && \
 docker_killtree "'"$signal"'" "$DOCKER_PID" || :
         '
         # Exec docker_exec_trap_command inside docker context
-        $SUDO docker exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command"
+        # Best-effort cleanup: a failing docker exec here must not change
+        # the script's exit status (e.g. container already gone on CI).
+        $SUDO docker exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command" || :
 
     fi
 

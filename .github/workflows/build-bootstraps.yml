@@ -22,7 +22,7 @@ jobs:
             output
           # Static key: keeps the incremental build state between runs.
           # Bump the version to force a fresh full rebuild.
-          key: termux-bootstrap-cache-v1
+          key: termux-bootstrap-cache-v2
       - name: Prepare cache directories
         run: |
           mkdir -p .termux-build-cache .data-data-cache output
@@ -46,7 +46,8 @@ jobs:
           path: |
             .termux-build-cache
             .data-data-cache
-          key: termux-bootstrap-cache-v1
+            output
+          key: termux-bootstrap-cache-v2
       - name: Verify ELF interpreter
         run: |
           echo "== build.log tail =="

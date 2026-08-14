@@ -669,6 +669,13 @@ main() {
 
 		# Build packages.
 		for package_name in "${PACKAGES_LIST[@]}"; do
+			# Self-heal: if a package was marked as built but its .deb
+			# files are missing (e.g. restored from a partial cache),
+			# force a rebuild by removing the build marker.
+			if ! compgen -G "${TERMUX_BUILT_PACKAGE_FILES_DIRECTORY}/${package_name}_*.deb" > /dev/null; then
+				echo "[*] No .deb found for '$package_name', forcing rebuild"
+				rm -f "${TERMUX_BUILT_PACKAGES_DIRECTORY}/${package_name}"
+			fi
 			set +e
 			build_package "$package_arch" "$package_name" || return $?
 			set -e

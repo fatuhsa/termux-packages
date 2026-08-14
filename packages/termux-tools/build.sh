@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.46.0+really1.45.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-tools/archive/refs/tags/v1.45.0.tar.gz
 TERMUX_PKG_SHA256=1ae29b1b875d95cc626dae323b45a2ace759969862d96094b2fa6d13bffe20d2
 TERMUX_PKG_ESSENTIAL=true
@@ -32,6 +32,24 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	TERMUX_PKG_CONFFILES="$(cat "$TERMUX_PKG_BUILDDIR/conffiles")"
+
+	# Custom Sanix welcome message (replaces the upstream motd).
+	cat > "$TERMUX_PREFIX/etc/motd" <<- EOF
+	Welcome to Sanix (io.sanix Termux fork)!
+
+	Docs:       https://github.com/fatuhsa/termux-snx
+	Community:  https://github.com/fatuhsa/termux-packages
+
+	Working with packages:
+	 - Search:  pkg search <query>
+	 - Install: pkg install <package>
+	 - Upgrade: pkg upgrade
+
+	Report issues at https://github.com/fatuhsa/termux-packages/issues
+	EOF
+	# The dynamic motd shown on wide terminals is generated from motd.sh.in;
+	# replace its title so it does not claim to be Termux.
+	sed -i 's/Welcome to Termux!/Welcome to Sanix!/g' "$TERMUX_PREFIX/etc/motd.sh" 2>/dev/null || true
 }
 
 termux_step_create_debscripts() {

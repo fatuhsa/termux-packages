@@ -15,7 +15,7 @@ jobs:
         run: |
           scripts/free-space.sh
           scripts/run-docker.sh sudo ln -sf "/data/data/io.sanix/aosp" /system || true
-          scripts/run-docker.sh ./scripts/build-bootstraps.sh --architectures aarch64 --no-build-unneeded-subpackages &> build.log || { echo "== BUILD FAILED, tail of build.log =="; tail -100 build.log; exit 1; }
+          scripts/run-docker.sh ./scripts/build-bootstraps.sh --architectures aarch64 &> build.log || { echo "== BUILD FAILED, tail of build.log =="; tail -100 build.log; exit 1; }
       - name: Verify ELF interpreter
         run: |
           echo "== build.log tail =="

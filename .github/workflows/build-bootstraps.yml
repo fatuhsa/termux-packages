@@ -51,8 +51,12 @@ jobs:
           echo "== build.log tail =="
           tail -30 build.log
           mkdir -p verify && cd verify && unzip -q ../bootstrap-aarch64.zip
-          echo "== login PT_INTERP =="
-          readelf -l bin/login | grep -A1 INTERP
+          echo "== file types =="
+          file bin/login bin/bash bin/ls
+          echo "== bash PT_INTERP =="
+          readelf -l bin/bash | grep -A1 INTERP
+          echo "== ls PT_INTERP =="
+          readelf -l bin/ls | grep -A1 INTERP
           echo "== ld-linux-aarch64.so.1 exists =="
           ls -l lib/ld-linux-aarch64.so.1
       - name: Upload artifacts

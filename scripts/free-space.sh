@@ -11,13 +11,15 @@ if [ "${CI-false}" != "true" ]; then
 	echo "ERROR: not running on CI, not deleting system files to free space!"
 	exit 1
 else
-	# shellcheck disable=SC2046
+	# Package purges are best-effort: newer runner images (2026+) have apt
+	# states where purging these can break the resolver. Failures are
+	# ignored; the directory removals below free the bulk of the space.
 	sudo apt purge -yq --allow-remove-essential $(
 		dpkg -l |
 			grep '^ii' |
 			awk '{ print $2 }' |
-			grep -P '(mecab|linux-azure-tools-|aspnetcore|liblldb-|netstandard-|llvm|clang|gcc-12|gcc-13|gcc-14|gcc-15|cpp-|g\+\+-|temurin-|gfortran-|mysql-|google-cloud-cli|postgresql-|cabal-|dotnet-|ghc-|mongodb-|libmono|mesa-|ant|liblua|python3|grub2-|grub-|shim-signed)'
-	)
+			grep -P '(mecab|linux-azure-tools-|aspnetcore|liblldb-|netstandard-|llvm|clang|gcc-1[2-5]|cpp-|g\+\+-|temurin-|gfortran-|mysql-|google-cloud-cli|postgresql-|cabal-|dotnet-|ghc-|mongodb-|libmono|mesa-|ant|liblua|python3|grub2-|grub-|shim-signed)'
+	) || true
 
 	sudo apt purge -yq \
 		snapd \
@@ -32,7 +34,7 @@ else
 		python3-botocore \
 		azure-cli \
 		shellcheck \
-		firefox
+		firefox || true
 		# google-chrome-stable
 		# microsoft-edge-stable already removed by the deps in the above apt purge
 
@@ -50,6 +52,6 @@ else
 	# the compressed parts are just collecting junk on the disk
 	sudo rm -rf /var/lib/containerd/io.containerd.content.v1.content/
 
-	sudo apt autoremove -yq
-	sudo apt clean
+	sudo apt autoremove -yq || true
+	sudo apt clean || true
 fi

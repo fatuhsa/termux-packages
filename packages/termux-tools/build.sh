@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.46.0+really1.45.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-tools/archive/refs/tags/v1.45.0.tar.gz
 TERMUX_PKG_SHA256=1ae29b1b875d95cc626dae323b45a2ace759969862d96094b2fa6d13bffe20d2
 TERMUX_PKG_ESSENTIAL=true
@@ -27,8 +27,12 @@ termux_step_post_get_source() {
 	# rewrites $PREFIX/etc/apt/sources.list from these files whenever the
 	# apt cache is stale; without this, it would rotate back to the
 	# official Termux mirrors, whose packages are built for com.termux
-	# and cannot be installed on io.sanix.
-	rm -rf "$TERMUX_PKG_SRCDIR/mirrors"
+	# and cannot be installed on io.sanix. Keep mirrors/Makefile.am so
+	# autoreconf can still generate mirrors/Makefile.in.
+	rm -rf "$TERMUX_PKG_SRCDIR/mirrors/asia" "$TERMUX_PKG_SRCDIR/mirrors/chinese_mainland" \
+		"$TERMUX_PKG_SRCDIR/mirrors/europe" "$TERMUX_PKG_SRCDIR/mirrors/north_america" \
+		"$TERMUX_PKG_SRCDIR/mirrors/oceania" "$TERMUX_PKG_SRCDIR/mirrors/russia"
+	find "$TERMUX_PKG_SRCDIR/mirrors" -maxdepth 1 -type f ! -name 'Makefile.am' -delete
 	mkdir -p "$TERMUX_PKG_SRCDIR/mirrors"
 	cat > "$TERMUX_PKG_SRCDIR/mirrors/default" <<- EOF
 	# Sanix (io.sanix) repository

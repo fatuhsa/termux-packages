@@ -58,11 +58,11 @@ jobs:
           echo "== login shebang (expect /data/data/io.sanix/files/usr/bin/sh) =="
           head -1 bin/login
           echo "== bash PT_INTERP (expect /system/bin/linker64: termux links against bionic) =="
-          readelf -l bin/bash | grep -A1 INTERP
-          echo "== ld-linux-aarch64.so.1 (glibc loader; optional in bootstrap) =="
-          ls -l lib/ld-linux-aarch64.so.1 2>&1 || true
-          echo "== NO com.termux references allowed =="
-          if grep -r "com.termux" . ; then echo "FOUND com.termux references!"; exit 1; fi
+          readelf -l bin/bash | grep "Requesting program interpreter"
+          echo "== SYMLINKS.txt (recreated by the app at install) =="
+          ls -l SYMLINKS.txt && wc -l SYMLINKS.txt
+          echo "== NO com.termux references allowed (excluding github.com/termux URLs) =="
+          if grep -r "com.termux" . | grep -v "github.com/termux" ; then echo "FOUND com.termux references!"; exit 1; fi
           echo "OK: no com.termux references found"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

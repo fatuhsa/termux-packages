@@ -684,6 +684,15 @@ main() {
 		# Extract all package files.
 		extract_package_files "$package_arch" "${PACKAGES_LIST[@]}"
 
+		# Sweep the rootfs for leftover upstream paths (covers stale debs
+		# restored from cache): replace /data/data/com.termux paths and
+		# com.termux.app.* class names. github.com/termux URLs are left
+		# untouched since they do not match these patterns.
+		local ROOTFS="$BOOTSTRAP_ROOTFS/${TERMUX_PREFIX}"
+		find "$ROOTFS" -type f -print0 | xargs -0 sed -i \
+			-e "s|/data/data/com\.termux|/data/data/${TERMUX_APP__PACKAGE_NAME}|g" \
+			-e "s|com\.termux\.app\.|${TERMUX_APP__NAMESPACE}.app.|g"
+
 		# Add termux bootstrap second stage files
 		add_termux_bootstrap_second_stage_files "$package_arch"
 

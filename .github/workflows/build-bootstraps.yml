@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
-      - name: Cache termux build state
-        uses: actions/cache@v4
+      - name: Cache termux build state (restore)
+        uses: actions/cache/restore@v4
         with:
           path: |
             .termux-build-cache
@@ -35,15 +35,26 @@ jobs:
           scripts/run-docker.sh sudo ln -sf "/data/data/io.sanix/aosp" /system || true
           scripts/run-docker.sh ./scripts/build-bootstraps.sh --architectures aarch64 --no-clean &> build.log || echo "== run-docker.sh exited $?, checking result =="
           test -f bootstrap-aarch64.zip || { echo "== NO ZIP PRODUCED, tail of build.log =="; tail -100 build.log; exit 1; }
+      - name: Save cache (even on failure)
+        # actions/cache@v4's post step only saves when every step succeeds,
+        # which would throw away partial build state on any failure.
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .termux-build-cache
+            .data-data-cache
+          key: termux-bootstrap-cache-v1
       - name: Verify ELF interpreter
         run: |
           echo "== build.log tail =="
           tail -30 build.log
           mkdir -p verify && cd verify && unzip -q ../bootstrap-aarch64.zip
           echo "== login PT_INTERP =="
-          readelf -l data/data/io.sanix/files/usr/bin/login | grep -A1 INTERP
+          readelf -l bin/login | grep -A1 INTERP
           echo "== ld-linux-aarch64.so.1 exists =="
-          ls -l data/data/io.sanix/files/usr/lib/ld-linux-aarch64.so.1
+          ls -l lib/ld-linux-aarch64.so.1
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

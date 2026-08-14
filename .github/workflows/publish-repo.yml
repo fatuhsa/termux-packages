@@ -1,0 +1,73 @@
+name: Publish Sanix repository
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Cache termux build state (restore)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .termux-build-cache
+            .data-data-cache
+            output
+          # Same key as the bootstrap build: shares incremental build state.
+          key: termux-bootstrap-cache-v2
+      - name: Prepare cache directories
+        run: |
+          mkdir -p .termux-build-cache .data-data-cache output
+      - name: Import repository signing key
+        env:
+          REPO_GPG_KEY: ${{ secrets.REPO_GPG_KEY }}
+        run: |
+          if [ -z "$REPO_GPG_KEY" ]; then
+            echo "Missing REPO_GPG_KEY secret - generating an ephemeral key"
+            gpg --batch --gen-key <<'EOF'
+%no-protection
+Key-Type: eddsa
+Key-Curve: ed25519
+Key-Usage: sign
+Name-Real: Sanix Repo
+Name-Email: sanix@fatuhsa.github.io
+Expire-Date: 0
+%commit
+EOF
+          else
+            echo "$REPO_GPG_KEY" | gpg --batch --import
+          fi
+      - name: Build sanix-hello
+        env:
+          TERMUX_DOCKER_NO_APPARMOR: "1"
+          TERMUX_DOCKER_RUN_EXTRA_ARGS: "--volume ${{ github.workspace }}/.termux-build-cache:/home/builder/.termux-build --volume ${{ github.workspace }}/.data-data-cache:/data/data"
+        run: |
+          scripts/run-docker.sh sudo ln -sf "/data/data/io.sanix/aosp" /system || true
+          scripts/run-docker.sh ./build-package.sh -a aarch64 sanix-hello &> build.log || { echo "== build failed =="; tail -100 build.log; exit 1; }
+          ls -la output/ | grep sanix-hello
+      - name: Generate repository
+        run: |
+          ./scripts/sanix-generate-repo.sh
+      - name: Save cache (even on failure)
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .termux-build-cache
+            .data-data-cache
+            output
+          key: termux-bootstrap-cache-v2
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./repo
+          publish_branch: gh-pages
+          force_orphan: true

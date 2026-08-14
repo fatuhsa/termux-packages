@@ -22,6 +22,11 @@ TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, gr
 TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"
 
 termux_step_pre_configure() {
+	# Replace the `com.termux` package name in source files, since the
+	# `TERMUX_APP_PACKAGE` env var is not exported by the build system
+	# and `configure.ac` would otherwise fall back to `com.termux`.
+	# `io.sanix` is shorter than `com.termux`, so no path length issues.
+	find . -type f -exec sed -i "s|com\.termux|$TERMUX_APP__PACKAGE_NAME|g" {} \;
 	autoreconf -vfi
 }
 

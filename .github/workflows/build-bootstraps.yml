@@ -1,0 +1,29 @@
+name: Build Termux bootstraps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Build bootstrap (aarch64)
+        run: |
+          scripts/free-space.sh
+          scripts/run-docker.sh sudo ln -sf "/data/data/io.sanix/aosp" /system
+          scripts/run-docker.sh ./scripts/build-bootstraps.sh --architectures aarch64 --no-build-unneeded-subpackages &> build.log
+      - name: Verify ELF interpreter
+        run: |
+          mkdir -p verify && cd verify && unzip -q ../bootstrap-aarch64.zip
+          echo "== login PT_INTERP =="
+          readelf -l data/data/io.sanix/files/usr/bin/login | grep -A1 INTERP
+          echo "== ld-linux-aarch64.so.1 exists =="
+          ls -l data/data/io.sanix/files/usr/lib/ld-linux-aarch64.so.1
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Termux bootstraps (aarch64)
+          path: |
+            ./bootstrap-aarch64.zip

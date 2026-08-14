@@ -19,12 +19,13 @@ jobs:
           path: |
             .termux-build-cache
             .data-data-cache
+            output
           # Static key: keeps the incremental build state between runs.
           # Bump the version to force a fresh full rebuild.
           key: termux-bootstrap-cache-v1
       - name: Prepare cache directories
         run: |
-          mkdir -p .termux-build-cache .data-data-cache
+          mkdir -p .termux-build-cache .data-data-cache output
           ls -ld .termux-build-cache .data-data-cache
       - name: Build bootstrap (aarch64)
         env:

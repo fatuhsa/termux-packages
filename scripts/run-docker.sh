@@ -130,6 +130,9 @@ fi
 APPARMOR_PARSER=""
 if [ -n "${TERMUX_DOCKER_NO_APPARMOR:-}" ]; then
 	echo "WARNING: TERMUX_DOCKER_NO_APPARMOR is set, AppArmor profiles will not be loaded!"
+	# The docker-default AppArmor profile blocks fuse mounts, which the
+	# NDK toolchain setup needs (fuse-overlayfs). Run unconfined instead.
+	SEC_OPT="$SEC_OPT --security-opt apparmor=unconfined"
 elif command -v apparmor_parser > /dev/null; then
 	APPARMOR_PARSER="apparmor_parser"
 fi

@@ -163,8 +163,11 @@ extract_debs() {
 		deb_file="$(find . -maxdepth 1 -type f \( -name "${package_name}_*_${package_arch}.deb" -o -name "${package_name}_*_all.deb" \))"
 		if [ -n "$deb_file" ]; then
 			if [ "$(echo "$deb_file" | wc -l)" -gt 1 ]; then
-				echo "More than one deb file found for package '$package_name'" 1>&2
-				return 1
+				# Multiple versions in cache (e.g. after a package revision bump):
+				# pick the newest one.
+				echo "Multiple debs found for '$package_name', picking newest:" 1>&2
+				deb_file="$(echo "$deb_file" | sort -V | tail -1)"
+				echo "  $deb_file" 1>&2
 			fi
 		else
 			echo "No deb file found for package '$package_name'" 1>&2

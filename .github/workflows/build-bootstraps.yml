@@ -20,9 +20,13 @@ jobs:
             .termux-build-cache
             .data-data-cache
             output
-          # Static key: keeps the incremental build state between runs.
-          # Bump the version to force a fresh full rebuild.
-          key: termux-bootstrap-cache-v2
+          # Unique key per run: actions/cache/save cannot overwrite an
+          # existing key (it fails silently), so a static key would make
+          # every save a no-op and every restore return the first snapshot.
+          # Restore falls back to the newest entry matching the prefix.
+          key: termux-bootstrap-cache-${{ github.run_id }}
+          restore-keys: |
+            termux-bootstrap-cache-
       - name: Prepare cache directories
         run: |
           mkdir -p .termux-build-cache .data-data-cache output
@@ -47,7 +51,7 @@ jobs:
             .termux-build-cache
             .data-data-cache
             output
-          key: termux-bootstrap-cache-v2
+          key: termux-bootstrap-cache-${{ github.run_id }}
       - name: Verify ELF interpreter
         run: |
           echo "== build.log tail =="

@@ -615,7 +615,9 @@ main() {
 
 		# Package manager.
 		if [[ "$BOOTSTRAP_ANDROID10_COMPATIBLE" == "false" ]]; then
-			PACKAGES_LIST+=("gpgv")
+			# `gpgv` was merged into `gnupg` upstream as a subpackage;
+			# building `gnupg` produces the `gpgv` deb.
+			PACKAGES_LIST+=("gnupg")
 			PACKAGES_LIST+=("apt")
 		fi
 

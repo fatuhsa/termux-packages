@@ -51,16 +51,19 @@ jobs:
       - name: Verify ELF interpreter
         run: |
           echo "== build.log tail =="
-          tail -30 build.log
+          tail -20 build.log
           mkdir -p verify && cd verify && unzip -q ../bootstrap-aarch64.zip
-          echo "== file types =="
-          file bin/login bin/bash bin/ls
-          echo "== bash PT_INTERP =="
+          echo "== bin/ contents =="
+          ls bin/ | sort
+          echo "== login shebang (expect /data/data/io.sanix/files/usr/bin/sh) =="
+          head -1 bin/login
+          echo "== bash PT_INTERP (expect /system/bin/linker64: termux links against bionic) =="
           readelf -l bin/bash | grep -A1 INTERP
-          echo "== ls PT_INTERP =="
-          readelf -l bin/ls | grep -A1 INTERP
-          echo "== ld-linux-aarch64.so.1 exists =="
-          ls -l lib/ld-linux-aarch64.so.1
+          echo "== ld-linux-aarch64.so.1 (glibc loader; optional in bootstrap) =="
+          ls -l lib/ld-linux-aarch64.so.1 2>&1 || true
+          echo "== NO com.termux references allowed =="
+          if grep -r "com.termux" . ; then echo "FOUND com.termux references!"; exit 1; fi
+          echo "OK: no com.termux references found"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

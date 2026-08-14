@@ -128,7 +128,9 @@ else
 fi
 
 APPARMOR_PARSER=""
-if command -v apparmor_parser > /dev/null; then
+if [ -n "${TERMUX_DOCKER_NO_APPARMOR:-}" ]; then
+	echo "WARNING: TERMUX_DOCKER_NO_APPARMOR is set, AppArmor profiles will not be loaded!"
+elif command -v apparmor_parser > /dev/null; then
 	APPARMOR_PARSER="apparmor_parser"
 fi
 

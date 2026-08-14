@@ -10,6 +10,8 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
       - name: Build bootstrap (aarch64)
+        env:
+          TERMUX_DOCKER_NO_APPARMOR: "1"
         run: |
           scripts/free-space.sh
           scripts/run-docker.sh sudo ln -sf "/data/data/io.sanix/aosp" /system
